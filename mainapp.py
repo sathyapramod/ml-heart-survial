@@ -9,10 +9,12 @@ import matplotlib
 matplotlib.use("Agg")
 import seaborn as sns 
 #sklearn
+from sklearn import preprocessing
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score,classification_report
 
 def main():
     """Automated ML App"""
@@ -21,12 +23,16 @@ def main():
     choice = st.sidebar.selectbox("Select Activities",activities)
 
     data = st.file_uploader("Upload a Dataset", type=["csv","txt","xlsx"])
+    
 
     if choice == 'EDA':
         st.subheader("Exploratory Data Analysis")
         if data is not None:
             df = pd.read_csv(data)
             st.dataframe(df.head())
+            lable = preprocessing.LabelEncoder()
+            for col in df.columns:
+                df[col] = lable.fit_transform(df[col])
 
             if st.checkbox("Show Shape"):
                 st.write(df.shape)
@@ -64,6 +70,9 @@ def main():
         if data is not None:
             df = pd.read_csv(data)
             st.dataframe(df.head())
+            lable = preprocessing.LabelEncoder()
+            for col in df.columns:
+                df[col] = lable.fit_transform(df[col])
 
         if st.checkbox("Show Value Counts"):
             st.write(df.iloc[:,-1].value_counts().plot(kind='bar'))
@@ -77,7 +86,10 @@ def main():
         if data is not None:
             df = pd.read_csv(data)
             st.dataframe(df.head())
-        
+            lable = preprocessing.LabelEncoder()
+            for col in df.columns:
+                df[col] = lable.fit_transform(df[col])
+               
         if st.checkbox("Summary"):
                 st.write(df.describe())
         
@@ -87,12 +99,13 @@ def main():
         col_name = st.selectbox("Select Column Name",["X","y"])
 
         if col_name == 'X':
-            st.write(X)
+            st.dataframe(X)
         elif col_name == 'y':
-            st.write(y)
+            st.dataframe(y)
         
+        st.write("Number of classes",len(np.unique(y)))
         params = dict()
-        classifer_name = st.sidebar.selectbox("Select Classifer",("SVM","Random Forest"))
+        classifer_name = st.sidebar.selectbox("Select Classifer",("SVM","Decision Tree","Random Forest"))
 
         #add parameters
         def add_parameters(clf_name):
@@ -100,6 +113,11 @@ def main():
             if clf_name == "SVM":
                 C = st.sidebar.slider("C",0.01,15.0)
                 params["C"] = C
+            elif clf_name == "Decision Tree":
+                max_depth = st.sidebar.slider("max_depth",2,15)
+                max_leaf_nodes = st.sidebar.slider("max_leaf_nodes",2,20)
+                params["max_depth"] = max_depth
+                params["max_leaf_nodes"] = max_leaf_nodes
             elif clf_name == "Random Forest":
                 max_depth = st.sidebar.slider("max_depth",2,15)
                 n_estimators = st.sidebar.slider("n_estimators",1,100)
@@ -113,15 +131,18 @@ def main():
         def get_classifiers(clf_name,params):
             clf = None
             if clf_name == "SVM":
-                clf = SVC(C=params["C"])
+                clf = SVC(C=params["C"],kernel='linear')
+            elif clf_name == "Decision Tree":
+                clf = DecisionTreeClassifier(max_depth=params["max_depth"],max_leaf_nodes=params["max_leaf_nodes"],random_state=100)
             elif clf_name == "Random Forest":
-                clf = RandomForestClassifier(n_estimators=params["n_estimators"],max_depth=params["max_depth"],random_state=7)
+                clf = RandomForestClassifier(n_estimators=params["n_estimators"],max_depth=params["max_depth"],random_state=100)
+            
             return clf
 
         clf = get_classifiers(classifer_name,params)
 
         #Classification
-        X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state=7)
+        X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state=100)
 
         clf.fit(X_train,y_train)
         y_pred = clf.predict(X_test)
