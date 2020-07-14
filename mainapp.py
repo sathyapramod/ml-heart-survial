@@ -105,12 +105,15 @@ def main():
         
         st.write("Number of classes",len(np.unique(y)))
         params = dict()
-        classifer_name = st.sidebar.selectbox("Select Classifer",("SVM","Decision Tree","Random Forest"))
+        classifer_name = st.sidebar.selectbox("Select Classifer",("SVM Linear","SVM Radial","Decision Tree","Random Forest"))
 
         #add parameters
         def add_parameters(clf_name):
             """Selection of parameters"""
-            if clf_name == "SVM":
+            if clf_name == "SVM Linear":
+                C = st.sidebar.slider("C",0.01,15.0)
+                params["C"] = C
+            elif clf_name == "SVM Radial":
                 C = st.sidebar.slider("C",0.01,15.0)
                 params["C"] = C
             elif clf_name == "Decision Tree":
@@ -130,8 +133,10 @@ def main():
         #get classifers
         def get_classifiers(clf_name,params):
             clf = None
-            if clf_name == "SVM":
+            if clf_name == "SVM Linear":
                 clf = SVC(C=params["C"],kernel='linear')
+            elif clf_name == "SVM Radial":
+                clf = SVC(C=params["C"],kernel='rbf')
             elif clf_name == "Decision Tree":
                 clf = DecisionTreeClassifier(max_depth=params["max_depth"],max_leaf_nodes=params["max_leaf_nodes"],random_state=100)
             elif clf_name == "Random Forest":
