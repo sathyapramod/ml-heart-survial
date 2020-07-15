@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use("Agg")
 import seaborn as sns 
 #sklearn
+from sklearn.neural_network import MLPClassifier,BernoulliRBM
 from sklearn import preprocessing
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -16,10 +17,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score,classification_report,f1_score,roc_auc_score
 
+
 def main():
     """Automated ML App"""
     st.title('Machine Learning Application')
-    activities = ["EDA","Plots","ML_Algorithms"]
+    activities = ["EDA","Plots","ML_Algorithms","Neural Network"]
     choice = st.sidebar.selectbox("Select Activities",activities)
 
     data = st.file_uploader("Upload a Dataset", type=["csv","txt","xlsx"])
@@ -165,7 +167,53 @@ def main():
         st.success(f"F1 score = {f_score}")
         st.warning(f"accuracy = {acc}")
 
+    elif choice == 'Neural Network':
+        st.subheader("Neural Networks (MLPClassifier)")
+
+        if data is not None:
+            df = pd.read_csv(data)
+            st.dataframe(df.head())
+            lable = preprocessing.LabelEncoder()
+            for col in df.columns:
+                df[col] = lable.fit_transform(df[col])
+            
+        X = df.iloc[:, :-1].values
+        y = df.iloc[:, -1].values
+
+        params = dict()
+        classifer_name = "MLPClassifier"
         
+        def add_parameters(clf_name):
+            """Selection of parameters"""
+            if clf_name == "MLPClassifier":
+                max_iter = st.sidebar.slider("max_iter",2,30)
+                params["max_iter"] = max_iter
+            
+            return params
+        
+        add_parameters(classifer_name)
+
+        #get classifers
+        def get_classifiers(clf_name,params):
+            clf = None
+            if clf_name == "MLPClassifier":
+                clf = MLPClassifier(max_iter=params["max_iter"])
+            
+            return clf
+        
+        clf = get_classifiers(classifer_name,params)
+        X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state=100)
+
+        clf.fit(X_train,y_train)
+        y_pred = clf.predict(X_test)
+        
+        st.write(f'<div style="color: #1C2331; font-size: medium; font-style: italic; padding: 15px; background-color:#b2dfdb;border-radius:5px;">Classifier = {classifer_name}</div></br>',unsafe_allow_html=True)
+        roc_auc = roc_auc_score(y_test,y_pred)
+        st.success(f"ROC AUC = {roc_auc}")
+        f_score = f1_score(y_test,y_pred)
+        st.success(f"F1 score = {f_score}")
+        acc = accuracy_score(y_test,y_pred)
+        st.warning(f"accuracy = {acc}")
 
 if __name__ == '__main__':
 	main()
