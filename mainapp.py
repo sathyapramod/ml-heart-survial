@@ -14,11 +14,11 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score,classification_report
+from sklearn.metrics import accuracy_score,classification_report,f1_score,roc_auc_score
 
 def main():
     """Automated ML App"""
-
+    st.title('Machine Learning Application')
     activities = ["EDA","Plots","ML_Algorithms"]
     choice = st.sidebar.selectbox("Select Activities",activities)
 
@@ -84,34 +84,9 @@ def main():
             st.pyplot()
 
         #Customized Plot
-        all_columns_names = df.columns.tolist()
-        type_of_plot = st.selectbox("Select Type of Plot",["area","bar","line","hist","box","kde"])
-        selected_columns_names = st.multiselect("Select Columns To Plot",all_columns_names)
-
-        if st.button("Generate Plot"):
-    				st.success("Generating Customizable Plot of {} for {}".format(type_of_plot,selected_columns_names))
-
-				# Plot By Streamlit
-				if type_of_plot == 'area':
-					cust_data = df[selected_columns_names]
-					st.area_chart(cust_data)
-
-				elif type_of_plot == 'bar':
-					cust_data = df[selected_columns_names]
-					st.bar_chart(cust_data)
-
-				elif type_of_plot == 'line':
-					cust_data = df[selected_columns_names]
-					st.line_chart(cust_data)
-
-				# Custom Plot 
-				elif type_of_plot:
-					cust_plot= df[selected_columns_names].plot(kind=type_of_plot)
-					st.write(cust_plot)
-					st.pyplot()
 
     elif choice == 'ML_Algorithms':
-        st.subheader("ML Algorithms")
+        st.subheader("Machine Learning Algorithms")
 
         if data is not None:
             df = pd.read_csv(data)
@@ -183,8 +158,12 @@ def main():
         y_pred = clf.predict(X_test)
 
         acc = accuracy_score(y_test,y_pred)
-        st.write(f"classifier = {classifer_name}")
-        st.write(f"accuracy = {acc}")
+        st.write(f'<div style="color: #1C2331; font-size: medium; font-style: italic; padding: 15px; background-color:#b2dfdb;border-radius:5px;">Classifier = {classifer_name}</div></br>',unsafe_allow_html=True)
+        roc_auc = roc_auc_score(y_test,y_pred)
+        st.success(f"ROC AUC = {roc_auc}")
+        f_score = f1_score(y_test,y_pred)
+        st.success(f"F1 score = {f_score}")
+        st.warning(f"accuracy = {acc}")
 
         
 
