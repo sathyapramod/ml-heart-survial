@@ -26,7 +26,6 @@ def main():
 
     data = st.file_uploader("Upload a Dataset", type=["csv","txt","xlsx"])
     
-    @st.cache
     if choice == 'EDA':
         st.subheader("Exploratory Data Analysis")
         if data is not None:
