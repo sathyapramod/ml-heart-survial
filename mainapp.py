@@ -211,14 +211,5 @@ def main():
         acc = accuracy_score(y_test,y_pred)
         st.warning(f"accuracy = {acc}")
 
-        st.subheader("Home")
-        html_temp = """
-        <div 
-        style="background-color:royalblue;padding:10px;border-radius:10px">
-        <h1 style="color:white;text-align:center;">Using Machine Learning Techniques predicting survial rate of heart failure patients</h1>
-        </div>
-        """
-        components.html(html_temp)
-
 if __name__ == '__main__':
 	main()
