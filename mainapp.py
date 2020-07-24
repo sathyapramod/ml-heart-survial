@@ -1,8 +1,12 @@
 # Core Pkgs
 import streamlit as st 
+import streamlit.components.v1 as components
 # EDA Pkgs
 import pandas as pd 
-import numpy as np 
+import numpy as np
+import codecs
+from pandas_profiling import ProfileReport 
+from streamlit_pandas_profiling import st_profile_report
 # Data Viz Pkg
 import matplotlib.pyplot as plt 
 import matplotlib
@@ -20,15 +24,24 @@ from sklearn.metrics import accuracy_score,classification_report,f1_score,roc_au
 
 def main():
     """Automated ML App"""
-    st.title('Machine Learning Application')
-    activities = ["EDA","Plots","ML_Algorithms","Neural Network"]
-    choice = st.sidebar.selectbox("Select Activities",activities)
+    
+    #st.title('Machine Learning Application')
+    activities = ["Home","EDA","Plots","ML_Algorithms","Neural Network"]
+    choice = st.sidebar.selectbox("Menu",activities)
 
+    html_temp = """
+        <div 
+        style="background-color:royalblue;padding:10px;border-radius:10px">
+        <h1 style="color:white;text-align:center;font-style: italic;">Using Machine Learning Techniques predicting survial rate of heart failure patients</h1>
+        </div>
+        """
+    components.html(html_temp)
     data = st.file_uploader("Upload a Dataset", type=["csv","txt","xlsx"])
     
     if choice == 'EDA':
-        st.subheader("Exploratory Data Analysis")
+        st.subheader("Exploratory Data Analysis using Pandas Profiling")
         if data is not None:
+            
             df = pd.read_csv(data)
             st.dataframe(df.head())
             lable = preprocessing.LabelEncoder()
@@ -85,6 +98,26 @@ def main():
             st.pyplot()
 
         #Customized Plot
+        all_columns_names = df.columns.tolist()
+        type_of_plot = st.selectbox("Select Type of Plot",["area","bar","line","hist","box","kde"])
+        selected_columns_names = st.multiselect("Select Columns To Plot",all_columns_names)
+        if st.button("Generate Plot"):
+            st.success("Generating Customizable Plot of {} for {}".format(type_of_plot,selected_columns_names))
+            # Plot By Streamlit
+            if type_of_plot == 'area':
+                cust_data = df[selected_columns_names]
+                st.area_chart(cust_data)
+            elif type_of_plot == 'bar':
+                cust_data = df[selected_columns_names]
+                st.bar_chart(cust_data)
+            elif type_of_plot == 'line':
+                cust_data = df[selected_columns_names]
+                st.line_chart(cust_data)
+    		# Custom Plot 
+            elif type_of_plot:
+                cust_plot= df[selected_columns_names].plot(kind=type_of_plot)
+                st.write(cust_plot)
+                st.pyplot()
 
     elif choice == 'ML_Algorithms':
         st.subheader("Machine Learning Algorithms")
@@ -102,12 +135,12 @@ def main():
         X = df.iloc[:, :-1].values
         y = df.iloc[:, -1].values
 
-        col_name = st.selectbox("Select Column Name",["X","y"])
+        #col_name = st.selectbox("Select Column Name",["X","y"])
 
-        if col_name == 'X':
-            st.dataframe(X)
-        elif col_name == 'y':
-            st.dataframe(y)
+        #if col_name == 'X':
+        #    st.dataframe(X)
+        #elif col_name == 'y':
+        #    st.dataframe(y)
         
         st.write("Number of classes",len(np.unique(y)))
         params = dict()
@@ -160,10 +193,8 @@ def main():
 
         acc = accuracy_score(y_test,y_pred)
         st.write(f'<div style="color: #1C2331; font-size: medium; font-style: italic; padding: 15px; background-color:#b2dfdb;border-radius:5px;">Classifier = {classifer_name}</div></br>',unsafe_allow_html=True)
-        roc_auc = roc_auc_score(y_test,y_pred)
-        st.success(f"ROC AUC = {roc_auc}")
-        f_score = f1_score(y_test,y_pred)
-        st.success(f"F1 score = {f_score}")
+        clf_report = classification_report(y_test,y_pred)
+        st.success(f"Classification Report:\n\n {clf_report}")
         st.warning(f"accuracy = {acc}")
 
     elif choice == 'Neural Network':
@@ -207,12 +238,19 @@ def main():
         y_pred = clf.predict(X_test)
         
         st.write(f'<div style="color: #1C2331; font-size: medium; font-style: italic; padding: 15px; background-color:#b2dfdb;border-radius:5px;">Classifier = {classifer_name}</div></br>',unsafe_allow_html=True)
-        roc_auc = roc_auc_score(y_test,y_pred)
-        st.success(f"ROC AUC = {roc_auc}")
-        f_score = f1_score(y_test,y_pred)
-        st.success(f"F1 score = {f_score}")
+        clf_report = classification_report(y_test,y_pred)
+        st.success(f"Classification Report:\n\n {clf_report}")
         acc = accuracy_score(y_test,y_pred)
         st.warning(f"accuracy = {acc}")
+
+        st.subheader("Home")
+        html_temp = """
+        <div 
+        style="background-color:royalblue;padding:10px;border-radius:10px">
+        <h1 style="color:white;text-align:center;">Using Machine Learning Techniques predicting survial rate of heart failure patients</h1>
+        </div>
+        """
+        components.html(html_temp)
 
 if __name__ == '__main__':
 	main()
