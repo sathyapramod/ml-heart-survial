@@ -36,13 +36,13 @@ def main():
         </div>
         """
     components.html(html_temp)
-    data = st.file_uploader("Upload a Dataset", type=["csv","txt","xlsx"])
-    
+    #data = st.file_uploader("Upload a Dataset", type=["csv","txt","xlsx"])
+    data = pd.read_csv('heart_failure.csv')
     if choice == 'EDA':
         st.subheader("Exploratory Data Analysis using Pandas Profiling")
         if data is not None:
             
-            df = pd.read_csv(data)
+            df = pd.read_csv('heart_failure.csv')
             st.dataframe(df.head())
             lable = preprocessing.LabelEncoder()
             for col in df.columns:
@@ -87,7 +87,7 @@ def main():
         st.subheader("Data Visualization")
 
         if data is not None:
-            df = pd.read_csv(data)
+            df = pd.read_csv('heart_failure.csv')
             st.dataframe(df.head())
             lable = preprocessing.LabelEncoder()
             for col in df.columns:
@@ -123,7 +123,7 @@ def main():
         st.subheader("Machine Learning Algorithms")
 
         if data is not None:
-            df = pd.read_csv(data)
+            df = pd.read_csv('heart_failure.csv')
             st.dataframe(df.head())
             lable = preprocessing.LabelEncoder()
             for col in df.columns:
@@ -201,7 +201,7 @@ def main():
         st.subheader("Neural Networks (MLPClassifier)")
 
         if data is not None:
-            df = pd.read_csv(data)
+            df = pd.read_csv('heart_failure.csv')
             st.dataframe(df.head())
             lable = preprocessing.LabelEncoder()
             for col in df.columns:
