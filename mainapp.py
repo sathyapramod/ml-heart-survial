@@ -47,41 +47,9 @@ def main():
             lable = preprocessing.LabelEncoder()
             for col in df.columns:
                 df[col] = lable.fit_transform(df[col])
-
-            if st.checkbox("Show Shape"):
-                st.write(df.shape)
-
-            if st.checkbox("Show Columns"):
-                all_columns = df.columns.to_list()
-                st.write(all_columns)
-
-            if st.checkbox("Summary"):
-                st.write(df.describe())
-
-            #Show Selected Columns to be done
-
-            if st.checkbox("Show Value Counts"):
-                st.write(df.iloc[:,-1].value_counts())
-
-            if st.checkbox("Correlation Plot -- matplotlib"):
-                plt.subplots(figsize=(10,10));
-                plt.matshow(df.corr())
-                corr = df.corr()
-                corr.style.background_gradient(cmap='coolwarm').set_precision(2)
-                st.pyplot()
-            
-            if st.checkbox("Correlation Plot -- seaborn"):
-                plt.subplots(figsize=(12,10));
-                st.write(sns.heatmap(df.corr(),annot=True,fmt='.2g'))
-                st.pyplot()
-
-            if st.checkbox("Pie Plot"):
-                all_columns = df.columns.to_list()
-                column_to_plot = st.selectbox("Select 1 Column", all_columns)
-                pie_plot = df[column_to_plot].value_counts().plot.pie(autopct="%1.1f%%")
-                plt.subplots(figsize=(12,10));
-                st.write(pie_plot)
-                st.pyplot()
+            #pandas profiling
+            profile = ProfileReport(df)
+            st_profile_report(profile)
     
     elif choice == 'Plots':
         st.subheader("Data Visualization")
