@@ -32,7 +32,7 @@ def main():
     html_temp = """
         <div 
         style="background-color:royalblue;padding:10px;border-radius:10px">
-        <h1 style="color:white;text-align:center;font-style: italic;">Using Machine Learning Techniques predicting survial rate of heart failure patients</h1>
+        <h1 style="color:white;text-align:center;font-style: italic;">Classifying the survival of patients with heart failure using Various Machine Learning Algorithms</h1>
         </div>
         """
     components.html(html_temp)
