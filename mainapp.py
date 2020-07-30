@@ -164,6 +164,8 @@ def main():
         clf_report = classification_report(y_test,y_pred)
         st.success(f"Classification Report:\n\n {clf_report}")
         st.warning(f"accuracy = {acc}")
+        for i in range(1,10):
+            st.write("Actual=%s, Predicted=%s" % (y_test[i], y_pred[i]))
 
     elif choice == 'Neural Network':
         st.subheader("Neural Networks (MLPClassifier)")
@@ -210,6 +212,8 @@ def main():
         st.success(f"Classification Report:\n\n {clf_report}")
         acc = accuracy_score(y_test,y_pred)
         st.warning(f"accuracy = {acc}")
+        for i in range(1,10):
+            st.write("Actual=%s, Predicted=%s" % (y_test[i], y_pred[i]))
 
 if __name__ == '__main__':
 	main()
